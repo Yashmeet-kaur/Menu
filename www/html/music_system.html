@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/skin/pink.flag/jplayer.pink.flag.min.css">
+    <style>
+        /* Your existing styles */
+        *, *:before, *:after {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+        }
+
+        body {
+            background: #eee url("https://i.imgur.com/82fLDu4.jpg") no-repeat center;
+            background-size: cover;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .music-player {
+            position: relative;
+            width: 350px;
+            height: 290px;
+            margin: 150px auto;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            background: #222;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .music-player img {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            bottom: 0px;
+            right: 0px;
+            z-index: -1;
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+            filter: blur(2px);
+        }
+        .music-player .info {
+            width: 100%;
+            height: 100px;
+            background: #222;
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            position: relative;
+        }
+        .music-player .info .jp-playlist li {
+            display: none;
+        }
+        .music-player .info .jp-playlist li a {
+            font-size: 30px;
+            font-weight: 300;
+            text-decoration: none;
+            color: #fff;
+            color: rgba(225, 225, 225, 0.4);
+        }
+        .music-player .info .jp-playlist li a span {
+            font-size: 14px;
+            display: block;
+            margin-top: 10px;
+        }
+        .music-player .info .jp-playlist li.jp-playlist-current {
+            display: block;
+        }
+        .music-player .info .jp-playlist li .jp-playlist-item {
+            text-align: center;
+        }
+        .music-player .info .jp-playlist li.jp-playlist-current a,
+        .music-player .info .jp-playlist li.jp-playlist-current a span {
+            color: #fff;
+            color: rgba(225, 225, 225, 0.8);
+        }
+        .music-player .info .left {
+            width: 50px;
+            height: 100px;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            padding: 10px;
+        }
+        .music-player .info .left a {
+            width: 100%;
+            height: 30px;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+        .music-player .info .left a:hover {
+            opacity: 0.8;
+        }
+        .music-player .info .left a.icon-shuffle {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+        }
+        .music-player .info .left a.icon-heart {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -30px;
+        }
+        .music-player .info .right {
+            width: 50px;
+            height: 100px;
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            padding: 10px;
+        }
+        .music-player .info .right a {
+            width: 100%;
+            height: 30px;
+            display: block;
+            margin-bottom: 10px;
+            opacity: 0.4;
+        }
+        .music-player .info .right a:hover {
+            opacity: 0.8;
+        }
+        .music-player .info .right a.icon-repeat {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -60px;
+        }
+        .music-player .info .right a.icon-share {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -90px;
+        }
+        .music-player .controls {
+            width: 100%;
+            height: 190px;
+            position: relative;
+            padding: 0px 10px;
+        }
+        .music-player .controls .current {
+            width: 100px;
+            margin: 0px auto;
+            text-align: center;
+            font-size: 14px;
+            padding-top: 10px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .music-player .controls .play-controls {
+            width: 215px;
+            margin: 0px auto;
+            text-align: center;
+            position: relative;
+            padding-top: 10px;
+        }
+        .music-player .controls .play-controls a {
+            width: 30px;
+            height: 30px;
+            display: block;
+            opacity: 0.4;
+            margin: 0px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        .music-player .controls .play-controls a:hover {
+            opacity: 0.8;
+        }
+        .music-player .controls .play-controls a.icon-previous {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -120px;
+        }
+        .music-player .controls .play-controls a.icon-play {
+            width: 30px;
+            height: 60px;
+            margin: 0px 40px;
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -150px;
+        }
+        .music-player .controls .play-controls a.icon-pause {
+            width: 30px;
+            height: 60px;
+            margin: 0px 40px;
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -210px;
+            display: none;
+        }
+        .music-player .controls .play-controls a.icon-next {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -270px;
+        }
+        .music-player .controls .volume-level {
+            width: 30px;
+            height: 90px;
+            position: relative;
+            margin: 10px auto;
+        }
+        .music-player .controls .volume-level a {
+            width: 30px;
+            height: 30px;
+            display: block;
+            opacity: 0.4;
+            margin-bottom: 10px;
+        }
+        .music-player .controls .volume-level a:hover {
+            opacity: 0.8;
+        }
+        .music-player .controls .volume-level a.icon-volume-up {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -300px;
+        }
+        .music-player .controls .volume-level a.icon-volume-down {
+            background: url("https://i.imgur.com/1p27hf4.png") no-repeat center center;
+            background-position: 0px -330px;
+        }
+        .music-player .controls .volume-level .ui-slider {
+            height: 100% !important;
+        }
+        .music-player .controls .volume-level .ui-slider .ui-slider-range {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .music-player .controls .volume-level .ui-slider .ui-slider-handle {
+            width: 30px;
+            height: 30px;
+            margin: -1px 0px 0px 0px;
+            border-radius: 0px;
+            background: #fff;
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+        }
+        .music-player .progress {
+            width: 100%;
+            height: 10px;
+            border-radius: 0px;
+            background: rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+        }
+        .music-player .progress .ui-slider-handle {
+            border-radius: 0px;
+            width: 10px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+            margin: -6px 0px 0px -5px;
+        }
+
+        .song-options {
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .song-options input[type="file"],
+        .song-options input[type="text"] {
+            margin: 10px auto;
+            display: block;
+        }
+
+        .song-options button {
+            margin: 10px auto;
+            padding: 10px 20px;
+            background: #222;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .song-options button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="music-player">
+        <div id="jquery_jplayer_1" class="jp-jplayer"></div>
+        <div id="jp_container_1" class="jp-audio" role="application" aria-label="media player">
+            <div class="jp-type-playlist">
+                <div class="jp-gui jp-interface">
+                    <div class="info">
+                        <ul class="jp-playlist">
+                            <li>&nbsp;</li>
+                        </ul>
+                    </div>
+                    <div class="controls">
+                        <div class="current-time">0:00</div>
+                        <div class="play-controls">
+                            <a href="javascript:;" class="jp-previous icon-previous">previous</a>
+                            <a href="javascript:;" class="jp-play icon-play">play</a>
+                            <a href="javascript:;" class="jp-pause icon-pause">pause</a>
+                            <a href="javascript:;" class="jp-next icon-next">next</a>
+                        </div>
+                        <div class="volume-level">
+                            <a href="javascript:;" class="jp-volume-up icon-volume-up">volume up</a>
+                            <a href="javascript:;" class="jp-volume-down icon-volume-down">volume down</a>
+                        </div>
+                        <div class="jp-progress">
+                            <div class="jp-seek-bar">
+                                <div class="jp-play-bar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="jp-no-solution">
+                    <span>Update Required</span>
+                    To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="song-options">
+        <input type="file" id="localAudioFile" accept="audio/*">
+        <button onclick="playLocalFile()">Play Local File</button>
+        <input type="text" id="wynkSongName" placeholder="Enter song name for Wynk Music">
+        <button onclick="playWynkMusic()">Play on Wynk Music</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jplayer/2.9.2/jquery.jplayer.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            new jPlayerPlaylist({
+                jPlayer: "#jquery_jplayer_1",
+                cssSelectorAncestor: "#jp_container_1"
+            }, [
+                {
+                    title: "Bubble",
+                    artist: "DJ",
+                    mp3: "http://www.jplayer.org/audio/mp3/Miaow-07-Bubble.mp3"
+                },
+                {
+                    title: "Lentement",
+                    artist: "DJ",
+                    mp3: "http://www.jplayer.org/audio/mp3/Miaow-03-Lentement.mp3"
+                },
+                {
+                    title: "Partir",
+                    artist: "DJ",
+                    mp3: "http://www.jplayer.org/audio/mp3/Miaow-01-Partir.mp3"
+                }
+            ], {
+                swfPath: "js",
+                supplied: "mp3",
+                wmode: "window",
+                useStateClassSkin: true,
+                autoBlur: false,
+                smoothPlayBar: true,
+                keyEnabled: true,
+                audioFullScreen: true
+            });
+
+            $("#jquery_jplayer_1").bind($.jPlayer.event.ready, function(event) {
+                $("#jquery_jplayer_1").jPlayer("setMedia", {
+                    mp3: "http://www.jplayer.org/audio/mp3/Miaow-07-Bubble.mp3"
+                });
+            });
+        });
+
+        function playLocalFile() {
+            const fileInput = document.getElementById('localAudioFile');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $("#jquery_jplayer_1").jPlayer("setMedia", {
+                        mp3: e.target.result
+                    }).jPlayer("play");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function playWynkMusic() {
+            const songName = document.getElementById('wynkSongName').value;
+            if (songName) {
+                const url = `https://wynk.in/music/detailsearch/${encodeURIComponent(songName)}`;
+                window.open(url, '_blank');
+            }
+        }
+    </script>
+</body>
+</html>
+

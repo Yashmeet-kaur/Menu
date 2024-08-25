@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload to S3 with AJAX</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            animation: changeGradient 10s infinite;
+        }
+
+        @keyframes changeGradient {
+            0% {
+                background: linear-gradient(to right, #ff8a00, #e52e71);
+            }
+            50% {
+                background: linear-gradient(to right, #7f00ff, #00ff00);
+            }
+            100% {
+                background: linear-gradient(to right, #ff00ff, #00ffff);
+            }
+        }
+
+        h2 {
+            color: #fff;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .upload-form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #status {
+            margin-top: 20px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+    <script>
+        function uploadFile() {
+            var fileInput = document.getElementById('fileInput');
+            var file = fileInput.files[0];
+            var formData = new FormData();
+            formData.append('file', file);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/cgi-bin/new_s3_upload.py', true);
+
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    var percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById('status').innerHTML = 'Uploading... ' + percentComplete.toFixed(2) + '%';
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById('status').innerHTML = 'File uploaded successfully!';
+                } else {
+                    document.getElementById('status').innerHTML = 'File upload failed!';
+                }
+            };
+
+            xhr.onerror = function() {
+                document.getElementById('status').innerHTML = 'File upload failed!';
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+</head>
+<body>
+    <h2>Upload File to S3 with AJAX</h2>
+    <div class="upload-form">
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" id="fileInput" name="file" required>
+            <br><br>
+            <input type="button" value="Upload File" onclick="uploadFile()">
+        </form>
+        <div id="status"></div>
+    </div>
+</body>
+</html>
+

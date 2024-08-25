@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video to Audio Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #ff8a00, #e52e71);
+            animation: changeGradient 10s infinite;
+        }
+
+        @keyframes changeGradient {
+            0% {
+                background: linear-gradient(to right, #ff8a00, #e52e71);
+            }
+            50% {
+                background: linear-gradient(to right, #7f00ff, #00ff00);
+            }
+            100% {
+                background: linear-gradient(to right, #ff00ff, #00ffff);
+            }
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .container input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background: #555;
+        }
+
+        .status {
+            margin-top: 20px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
+    <script>
+        function uploadFile() {
+            var fileInput = document.getElementById('file');
+            var formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/cgi-bin/video_to_audio.py', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById('status').innerHTML = xhr.responseText;
+                } else {
+                    document.getElementById('status').innerHTML = 'Error during conversion.';
+                }
+            };
+            xhr.send(formData);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Video to Audio Converter</h2>
+        <input type="file" id="file" accept="video/*">
+        <button onclick="uploadFile()">Convert</button>
+        <div id="status" class="status"></div>
+    </div>
+</body>
+</html>
+
